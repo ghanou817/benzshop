@@ -1,0 +1,8 @@
+# متطلبات backend لـ BenzShop
+# إذا اخترت Django
+Django>=4.2
+psycopg2-binary>=2.9
+gunicorn
+dj-database-url
+# إذا اخترت Node.js، سيتم لاحقاً إنشاء package.json
+# مكتبات إضافية لتوليد PDF ورفع الصور ستضاف لاحقًا
