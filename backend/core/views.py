@@ -3,6 +3,10 @@ from django.contrib import messages
 from django.contrib.sessions.models import Session
 from .forms import RegisterForm, LoginForm
 from .models import User
+from django.http import HttpResponse
+
+def home(request):
+    return HttpResponse("مرحباً بك في موقع BenzShop! 🚀")
 
 def register_view(request):
     if request.method == 'POST':
