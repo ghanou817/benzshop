@@ -3,6 +3,8 @@
 Django>=4.2
 psycopg2-binary>=2.9
 Pillow
+django-cors-headers
+django-cors-headers
 gunicorn
 dj-database-url
 # إذا اخترت Node.js، سيتم لاحقاً إنشاء package.json
