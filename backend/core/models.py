@@ -91,6 +91,20 @@ class Notification(models.Model):
     def __str__(self):
         return f"تنبيه {self.type} للمستخدم {self.user.phone if self.user else 'عام'}"
 
+class About(models.Model):
+    content = models.TextField()
+    last_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return 'من نحن'
+
+class Contact(models.Model):
+    content = models.TextField()
+    last_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return 'اتصل بنا'
+
 class Setting(models.Model):
     key = models.CharField(max_length=100, primary_key=True)
     value = models.TextField()

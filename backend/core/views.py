@@ -40,7 +40,7 @@ def logout_view(request):
     return redirect('login')
 
 from django.http import JsonResponse
-from .models import Product, ProductImage, Flavor, Category
+from .models import Product, ProductImage, Flavor, Category, About, Contact
 from django.views.decorators.csrf import csrf_exempt
 import json
 
@@ -136,3 +136,11 @@ def product_detail_api(request, product_id):
         return JsonResponse({'product': data})
     except Product.DoesNotExist:
         return JsonResponse({'error': 'المنتج غير موجود'}, status=404)
+
+def about_api(request):
+    about = About.objects.order_by('-last_updated').first()
+    return JsonResponse({'content': about.content if about else ''})
+
+def contact_api(request):
+    contact = Contact.objects.order_by('-last_updated').first()
+    return JsonResponse({'content': contact.content if contact else ''})
