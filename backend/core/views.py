@@ -40,9 +40,72 @@ def logout_view(request):
     return redirect('login')
 
 from django.http import JsonResponse
-from .models import Product, ProductImage, Flavor, Category, About, Contact
+from .models import Product, ProductImage, Flavor, Category, About, Contact, Cart, CartItem
 from django.views.decorators.csrf import csrf_exempt
 import json
+
+@csrf_exempt
+def cart_api(request):
+    # Auth: user_id in session
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return JsonResponse({'error': 'يجب تسجيل الدخول أولاً'}, status=403)
+    from django.db.models import F
+    try:
+        from .models import User
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'المستخدم غير موجود'}, status=404)
+
+    # Get or create cart for user
+    cart, _ = Cart.objects.get_or_create(user=user)
+
+    if request.method == 'GET':
+        items = [
+            {
+                'id': item.id,
+                'product_id': item.product.id,
+                'product_name': item.product.name,
+                'price': float(item.product.price),
+                'quantity': item.quantity,
+                'image': item.product.images.first().image.url if item.product.images.exists() else '',
+            }
+            for item in cart.items.select_related('product').all()
+        ]
+        return JsonResponse({'items': items})
+
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body.decode())
+            product_id = data.get('product_id')
+            qty = int(data.get('qty', 1))
+            product = Product.objects.get(id=product_id)
+            item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+            if not created:
+                item.quantity = F('quantity') + qty
+            else:
+                item.quantity = qty
+            item.save()
+            item.refresh_from_db()
+            return JsonResponse({'success': True, 'item_id': item.id, 'quantity': item.quantity})
+        except Product.DoesNotExist:
+            return JsonResponse({'error': 'المنتج غير موجود'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    if request.method == 'DELETE':
+        try:
+            data = json.loads(request.body.decode())
+            item_id = data.get('item_id')
+            item = CartItem.objects.get(id=item_id, cart=cart)
+            item.delete()
+            return JsonResponse({'success': True})
+        except CartItem.DoesNotExist:
+            return JsonResponse({'error': 'العنصر غير موجود في السلة'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 @csrf_exempt
 def login_api(request):

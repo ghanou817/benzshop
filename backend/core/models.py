@@ -105,6 +105,23 @@ class Contact(models.Model):
     def __str__(self):
         return 'اتصل بنا'
 
+class Cart(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='carts')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"سلة {self.user.phone} ({self.id})"
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.product.name} x {self.quantity} ({self.cart.user.phone})"
+
 class Setting(models.Model):
     key = models.CharField(max_length=100, primary_key=True)
     value = models.TextField()
