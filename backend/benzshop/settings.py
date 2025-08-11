@@ -104,6 +104,9 @@ else:
 CORS_ALLOWED_ORIGINS = [
     "https://benzshop.netlify.app",
 ]
+CORS_ALLOW_CREDENTIALS = True
+SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SECURE = True
 
 AUTH_PASSWORD_VALIDATORS = [
     {
