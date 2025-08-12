@@ -107,7 +107,6 @@ def cart_api(request):
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-@csrf_exempt
 def login_api(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -120,6 +119,8 @@ def login_api(request):
         user = User.objects.get(phone=phone)
         if not check_password(password, user.password_hash):
             return JsonResponse({'error': 'كلمة المرور غير صحيحة'}, status=400)
+        # Set user_id in session for authentication
+        request.session['user_id'] = user.id
         return JsonResponse({'success': True, 'user': {
             'id': user.id,
             'first_name': user.first_name,
@@ -131,6 +132,7 @@ def login_api(request):
         return JsonResponse({'error': 'رقم الهاتف غير مسجل'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
+
 
 @csrf_exempt
 def register_api(request):
