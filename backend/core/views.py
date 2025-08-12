@@ -107,6 +107,9 @@ def cart_api(request):
 
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
 def login_api(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
