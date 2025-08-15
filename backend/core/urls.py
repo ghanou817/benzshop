@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import direct_order_api
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -14,5 +15,5 @@ urlpatterns = [
     path('api/cart/', views.cart_api, name='cart_api'),
     path('api/about/', views.about_api, name='about_api'),
     path('api/contact/', views.contact_api, name='contact_api'),
+    path('api/direct_order/', direct_order_api, name='direct_order_api'),
 ]
-

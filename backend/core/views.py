@@ -328,6 +328,33 @@ def about_api(request):
     about = About.objects.order_by('-last_updated').first()
     return JsonResponse({'content': about.content if about else ''})
 
+@csrf_exempt
+def direct_order_api(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    try:
+        data = json.loads(request.body.decode())
+        # Expected fields
+        first_name = data.get('first_name', '').strip()
+        last_name = data.get('last_name', '').strip()
+        phone = data.get('phone', '').strip()
+        products = data.get('products', [])  # [{product_id, qty}, ...]
+        state = data.get('state', '').strip()
+        commune = data.get('commune', '').strip()
+        shop_address = data.get('shop_address', '').strip()
+        shop_name = data.get('shop_name', '').strip()  # optional
+        # Basic validation
+        if not (first_name and last_name and phone and products and state and commune and shop_address):
+            return JsonResponse({'error': 'يرجى ملء جميع البيانات المطلوبة'} , status=400)
+        # Save order (simple: print/log, or extend to DB)
+        # For now, just log to console/server for demo
+        import logging
+        logging.warning(f"طلب جديد: {first_name} {last_name}, هاتف: {phone}, منتجات: {products}, ولاية: {state}, بلدية: {commune}, عنوان: {shop_address}, اسم المحل: {shop_name}")
+        # يمكنك هنا لاحقاً إضافة حفظ للطلب في قاعدة البيانات أو إرسال إشعار
+        return JsonResponse({'success': True, 'msg': 'تم استقبال الطلب بنجاح'})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
 def contact_api(request):
     contact = Contact.objects.order_by('-last_updated').first()
     return JsonResponse({'content': contact.content if contact else ''})
